@@ -11,15 +11,16 @@ import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkView;
 
 
-public class e1zoneFragment extends Fragment {
+public class XWalkViewFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private XWalkView mXWalkView;
+    private static String mUrl;
 
 
-    public e1zoneFragment() {
+    public XWalkViewFragment() {
     }
 
     @Override
@@ -31,8 +32,12 @@ public class e1zoneFragment extends Fragment {
         mXWalkView = (XWalkView) v.findViewById(R.id.xwalkview);
         //enable remote debugging
         XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
-        mXWalkView.load("http://www.e1zone.de",null);
+        mXWalkView.load(mUrl,null);
         return v;
+    }
+
+    public void setUrl(String url){
+        mUrl = url;
     }
 
     @Override

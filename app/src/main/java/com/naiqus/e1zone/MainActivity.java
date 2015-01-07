@@ -1,25 +1,46 @@
 package com.naiqus.e1zone;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 
 import org.xwalk.core.XWalkPreferences;
 
 
-public class MainActivity extends Activity{
+public class MainActivity extends ActionBarActivity {
 
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         XWalkPreferences.setValue(XWalkPreferences.ANIMATABLE_XWALK_VIEW, true);
         setContentView(R.layout.activity_main);
+        XWalkViewFragment mxWalkViewFragment = new XWalkViewFragment();
+
+        //set up drawer
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
+
+
+
+
         if (savedInstanceState == null){
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new e1zoneFragment())
+                    .add(R.id.main_container, mxWalkViewFragment)
                     .commit();
+            //set URL to the Fragment
+            mxWalkViewFragment.setUrl(getString(R.string.host_url));
         }
 
+    }
+
+//    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        // update the main content by replacing fragments
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+//                .commit();
     }
 
 
