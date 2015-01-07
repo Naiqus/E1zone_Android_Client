@@ -1,0 +1,2 @@
+include ':app', ':discourse-api-client-0.0.3'
+include ':crosswalkwebview10392359arm'
