@@ -8,6 +8,7 @@ import org.xwalk.core.XWalkPreferences;
 
 public class MainActivity extends ActionBarActivity {
 
+    
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
     @Override

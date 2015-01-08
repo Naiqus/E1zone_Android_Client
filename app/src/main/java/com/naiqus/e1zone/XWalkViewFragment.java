@@ -3,10 +3,13 @@ package com.naiqus.e1zone;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkView;
 
@@ -33,6 +36,20 @@ public class XWalkViewFragment extends Fragment {
         //enable remote debugging
         XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
         mXWalkView.load(mUrl,null);
+
+        Button loginButton = (Button) getActivity().findViewById(R.id.login_btn);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mXWalkView.addJavascriptInterface(new Object(){
+                    @JavascriptInterface
+                    public void test(){
+                        Log.v("JS","test");
+                    }
+                },"Android");
+                mXWalkView.load("javascript:(function(){document.getElementByClassName('login-button').click();})()",null);
+            }
+        });
         return v;
     }
 
