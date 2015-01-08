@@ -14,6 +14,7 @@ import com.wareninja.opensource.discourse.utils.MyWebClient;
 import com.wareninja.opensource.discourse.utils.ResponseListener;
 import com.wareninja.opensource.discourse.utils.ResponseModel;
 
+import org.apache.http.client.CookieStore;
 import org.apache.http.util.TextUtils;
 
 import java.util.HashMap;
@@ -24,10 +25,14 @@ public class DiscourseApiClient {
 	String api_url = "";// base url. e.g. http://your_discourse_domain.com
 	String api_key = "";
 	String api_username = "";
+
+    private MyWebClient webClient;
+
 	public DiscourseApiClient(String api_url, String api_key, String api_username) {
 		this.api_url = api_url;
 		this.api_key = api_key;
 		this.api_username = api_username;
+        webClient = new MyWebClient(this.api_url);
 	}
 	//public DiscourseApiClient() {
 	//}
@@ -50,7 +55,18 @@ public class DiscourseApiClient {
 		NEW_PRIVATE_MESSAGE,
 		GOT_PRIVATE_MESSAGE
 	};
-	
+
+
+/////////////////////
+//COOKIES
+/////////////////////
+
+    //get cookies from the HttpClient
+
+    public CookieStore getCookieStore(){
+        return webClient.getCookieStore();
+    }
+
 /////////////////////
 //USERS
 /////////////////////
@@ -81,7 +97,7 @@ public class DiscourseApiClient {
 		
 		// example: https://base_domain/users/<username>.json?api_key=<key>&api_username=<caller_username>
 		
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//-if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -171,7 +187,7 @@ public class DiscourseApiClient {
 		 */
 		if (!confirmationValue.startsWith("ERROR|")) {
 			
-			MyWebClient webClient = new MyWebClient(this.api_url);
+
 			//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 			//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
 			
@@ -230,7 +246,7 @@ public class DiscourseApiClient {
 		final String TAG = "fetchConfirmationValue";
 		
 		
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -278,7 +294,7 @@ public class DiscourseApiClient {
 		this.put('admin/users/' + id + '/approve',
     	{ context: 'admin/users/' + username },
 		 */
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -337,7 +353,7 @@ public class DiscourseApiClient {
 		this.put('admin/users/' + id + '/activate',
     	{ context: 'admin/users/' + username },
 		 */
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -393,7 +409,7 @@ public class DiscourseApiClient {
 		/*  admin_user_trust_level PUT      /admin/users/:user_id/trust_level(.:format)
 		 * 
 		 */
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -450,7 +466,7 @@ public class DiscourseApiClient {
 		final String TAG = "generateApiKey"; 
 		/*  admin_user_generate_api_key POST     /admin/users/:user_id/generate_api_key(.:format) 
 		 */
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		
 		String methodName = "";
@@ -536,7 +552,7 @@ public class DiscourseApiClient {
 		final String TAG = "loginUser";
 		// this.post('session', { 'login': username, 'password': password },
 		
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -602,6 +618,7 @@ public class DiscourseApiClient {
 /////////////////////
 //SEARCH
 /////////////////////
+
 	
 	/**
 	 * searchForUser
@@ -629,7 +646,7 @@ public class DiscourseApiClient {
 		 */
 		final String TAG = "searchForUser";
 		
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//-if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -690,7 +707,7 @@ this.get('search.json', { term: term }, function(error, body, httpCode) {
 		 */
 		final String TAG = "search";
 		
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//-if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -786,7 +803,7 @@ this.post('posts', { 'title': title, 'raw': raw, 'category': category, 'archetyp
     callback(error, body, httpCode);
   });
 		 */
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);
@@ -840,7 +857,7 @@ this.post('posts', { 'title': title, 'raw': raw, 'category': category, 'archetyp
 		// SYNCHRONOUS function
 		
 		final String TAG = "getCreatedTopics";
-		MyWebClient webClient = new MyWebClient(this.api_url);
+
 		if (parameters==null) parameters = new HashMap<String, String>();
 		//if (!TextUtils.isEmpty(this.api_key)) parameters.put("api_key", this.api_key);
 		//if (!TextUtils.isEmpty(this.api_username)) parameters.put("api_username", this.api_username);

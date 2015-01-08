@@ -30,19 +30,21 @@ import com.google.gson.JsonObject;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.util.TextUtils;
@@ -68,6 +70,7 @@ public class MyWebClient {
 	private final static int TIMEOUT = 30000;
 
 	private List<RequestHeader> requestHeaders = new LinkedList<RequestHeader>();
+    private CookieStore cookieStore;
 
 	CloseableHttpResponse httpResponse = null;
 	HttpGet httpGet = null; // GET
@@ -92,17 +95,28 @@ public class MyWebClient {
                 sslContext,
                 SSLConnectionSocketFactory.STRICT_HOSTNAME_VERIFIER);
 
-		httpClient = HttpClientBuilder.create()
-            .setSSLSocketFactory(sslsf)
+        httpRequestConfig = RequestConfig.custom()
+                .setSocketTimeout(TIMEOUT)
+                .setConnectTimeout(TIMEOUT)
+                .setCookieSpec(CookieSpecs.BEST_MATCH)
                 .build();
 
-//		httpRequestConfig = RequestConfig.custom()
-//		        .setSocketTimeout(TIMEOUT)
-//		        .setConnectTimeout(TIMEOUT)
-//		        .build();
-		
-		localContext = new BasicHttpContext();
+        cookieStore = new BasicCookieStore();
+
+        httpClient = HttpClientBuilder.create()
+            .setSSLSocketFactory(sslsf)
+            .setDefaultCookieStore(cookieStore)
+            .setDefaultRequestConfig(httpRequestConfig)
+                .build();
+
+
+		localContext = HttpClientContext.create();
+
 	}
+
+    public CookieStore getCookieStore(){
+        return cookieStore;
+    }
 
 	public void setWebServiceUrl(String webServiceUrl) {
 		this.webServiceUrl = webServiceUrl;
@@ -239,7 +253,7 @@ public class MyWebClient {
 		// NOTE: by default we post ONLY json data! 
         StringEntity requestEntity = null;
         try {
-            requestEntity = new StringEntity(jsonBodyStr);
+            requestEntity = new StringEntity(jsonBodyStr,"UTF-8");
             httpPost.setEntity(requestEntity);
             httpPost.setHeader("Content-type", "application/json");
             Log.v("httpPost",jsonBodyStr);
@@ -249,7 +263,7 @@ public class MyWebClient {
 
 		try {
 			httpResponse = httpClient.execute(httpPost);
-			httpResponseCode = httpResponse.getStatusLine().getStatusCode(); 
+			httpResponseCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity responseEntity = httpResponse.getEntity();
 			if (httpResponseCode >= 200 && httpResponseCode < 300) {
 				responseStr = responseEntity!=null ? EntityUtils.toString(responseEntity) : "";
@@ -301,11 +315,9 @@ public class MyWebClient {
 		
 		// NOTE: by default we post ONLY json data! 
         try {
-            StringEntity requestEntity = new StringEntity(
-                    jsonBodyStr
-                    , ContentType.create("application/json", "UTF-8").toString()
-                    );
-            httpPut.setEntity(requestEntity);
+            StringEntity requestEntity = new StringEntity(jsonBodyStr,"UTF-8");
+            httpPost.setEntity(requestEntity);
+            httpPost.setHeader("Content-type", "application/json");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
