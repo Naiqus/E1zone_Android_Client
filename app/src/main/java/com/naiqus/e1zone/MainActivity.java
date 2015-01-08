@@ -1,14 +1,21 @@
 package com.naiqus.e1zone;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+
+import com.wareninja.opensource.discourse.DiscourseApiClient;
+import com.wareninja.opensource.discourse.utils.ResponseModel;
 
 import org.xwalk.core.XWalkPreferences;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
     @Override
@@ -43,6 +50,8 @@ public class MainActivity extends ActionBarActivity {
 //                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
 //                .commit();
     }
+
+
 
 
 

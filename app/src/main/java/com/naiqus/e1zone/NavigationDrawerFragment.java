@@ -3,14 +3,20 @@ package com.naiqus.e1zone;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.wareninja.opensource.discourse.DiscourseApiClient;
+import com.wareninja.opensource.discourse.utils.ResponseModel;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class NavigationDrawerFragment extends Fragment {
@@ -43,6 +49,8 @@ private ArrayAdapter<String> mCategoryAdapter;
         );
         mNavigationDrawerList = (ListView) rootView.findViewById(R.id.category_list);
         mNavigationDrawerList.setAdapter(mCategoryAdapter);
+
+
 
         return rootView;
     }

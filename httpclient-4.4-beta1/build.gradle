@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('httpclient-4.4-beta1.jar'))
