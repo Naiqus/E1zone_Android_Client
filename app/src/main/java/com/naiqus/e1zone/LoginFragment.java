@@ -6,9 +6,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -55,6 +57,8 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
     private View mLoginFormView;
     private View mEmailLoginFormView;
     private CookieStore mCookieStore;
+    private String mLoginError;
+    private String mGenerateAPIError;
 
 
     public LoginFragment() {
@@ -263,7 +267,7 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
         mEmailView.setAdapter(adapter);
     }
 
-    public class UserLoginTask extends AsyncTask<Void, Void, ResponseModel> {
+    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
@@ -274,12 +278,12 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
         }
 
         @Override
-        protected ResponseModel doInBackground(Void... params){
+        protected Boolean doInBackground(Void... params){
             //test Discourse API
             final DiscourseApiClient mDiscourseClient = new DiscourseApiClient(
                     getString(R.string.host_url),
                     getString(R.string.api_key),
-                    getString(R.string.api_key)
+                    getString(R.string.api_user)
             );
 //            showProgress(true);
 
@@ -289,53 +293,81 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
             param.put("login",mEmail);
             param.put("password",mPassword);
             //do the method
-            responseModel = mDiscourseClient.loginUser(param);
+            responseModel = mDiscourseClient.loginUser(param); //send login request
+            Log.v("DisourseAPI", responseModel.toString());
+            mCookieStore = mDiscourseClient.getCookieStore();       //get cookies
 //            Map<String,String> parameters = new HashMap<String, String>();
 //            parameters.put("name", test_username);
 //            parameters.put("email", test_username+"@dummy.com");
 //            parameters.put("username", test_username);
 //            parameters.put("password", test_username+"_pwd");
 //            responseModel = mDiscourseClient.createUser(parameters);
-            Log.v("DisourseAPI", responseModel.toString());
-            mCookieStore = mDiscourseClient.getCookieStore();
-            return responseModel; //return cookie
-        }
-
-        @Override
-        protected void onPostExecute (ResponseModel result){
-            mAuthTask = null;
             try {
-                JSONObject mResponse = new JSONObject(result.data.toString());
+                JSONObject mResponse = new JSONObject(responseModel.data.toString());
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("preference",Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
                 if (mResponse.has("error")){ //signed in failed
-                    showProgress(false);
-                    mPasswordView.setError(mResponse.getString("error").toString());
-                    mPasswordView.requestFocus();
+                    mLoginError = mResponse.getString("error").toString();
+                    editor.putBoolean("logged_in",false);
+                    return false;
 
                 }else {  //signed in successfully
-                    List<Cookie> mCookies = mCookieStore.getCookies();
-                    String[] cookieArray = new String[mCookies.size()];
-                    int i = 0;
-                    for (Cookie cookie : mCookies) {    //parse cookie to string
-                        String setCookie = new StringBuilder(cookie.getName())
-                                .append("=")
-                                .append(cookie.getValue())
-                                .append("; domain=").append(cookie.getDomain())
-                                .append("; path=").append(cookie.getPath())
-                                .toString();
-                        cookieArray[i] = setCookie;
-                        i++;
-                    }
-                    showProgress(false);
-                    // Todo: set login = true in Preference
+                    editor.putBoolean("logged_in",true);
+                    //process response data
+                    JSONObject userInfoJSON = mResponse.getJSONObject("user");
+                    String avatarURL = userInfoJSON.getString("avatar_template").replaceAll("\\{size\\}","120"); //avatar 120x120
+                    String userID = Integer.toString(userInfoJSON.getInt("id"));
+                    //generate user API key
+                    Map<String,String> userAPIParam = new HashMap<String, String>();
+                    userAPIParam.put("userid",userID);
+                    ResponseModel userAPIResponse = mDiscourseClient.generateApiKey(userAPIParam);
+                    mResponse = new JSONObject(userAPIResponse.data.toString());
+                    //store info to preference
+                    editor.putString("user_name",userInfoJSON.getString("username"))
+                          .putString("avatar_url",avatarURL)
+                          .putString("name",userInfoJSON.getString("name"))
+                          .putString("profile_background_url",userInfoJSON.getString("profile_background"))
+                          .putString("user_id",Integer.toString(userInfoJSON.getInt("id")))
+                          .putString("api_key",mResponse.getJSONObject("api_key").getString("key"))
+                          .apply();
 
-
-                    Intent mainActivityIntent = new Intent(getActivity(), MainActivity.class);
-                    mainActivityIntent.putExtra("cookieArray", cookieArray);
-                    getActivity().startActivity(mainActivityIntent);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            return true; //return cookie
+        }
+
+        @Override
+        protected void onPostExecute (Boolean result){
+            mAuthTask = null;
+            if (result) {
+                //signed in successfully
+                List<Cookie> mCookies = mCookieStore.getCookies();
+                String[] cookieArray = new String[mCookies.size()];
+                //prepare for the cookies
+                int i = 0;
+                for (Cookie cookie : mCookies) {    //parse cookie to string
+                    String setCookie = new StringBuilder(cookie.getName())
+                            .append("=")
+                            .append(cookie.getValue())
+                            .append("; domain=").append(cookie.getDomain())
+                            .append("; path=").append(cookie.getPath())
+                            .toString();
+                    cookieArray[i] = setCookie;
+                    i++;
+                }
+                Intent mainActivityIntent = new Intent(getActivity(), MainActivity.class);
+                mainActivityIntent.putExtra("cookieArray", cookieArray);
+                getActivity().startActivity(mainActivityIntent);
+                showProgress(false);
+            }else{          //signed in failed
+                showProgress(false);
+                mPasswordView.setError(mLoginError);
+                mPasswordView.requestFocus();
+            }
+
+
         }
 
     }

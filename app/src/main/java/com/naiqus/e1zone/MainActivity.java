@@ -1,9 +1,6 @@
 package com.naiqus.e1zone;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 
 import org.xwalk.core.XWalkPreferences;
@@ -19,8 +16,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         XWalkPreferences.setValue(XWalkPreferences.ANIMATABLE_XWALK_VIEW, true);
         setContentView(R.layout.activity_main);
-        PreferenceManager.setDefaultValues(this,R.xml.preference,false); //reade preference first
-        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        //PreferenceManager.setDefaultValues(this,R.xml.preference,false); //reade preference first
+
 
         mxWalkViewFragment = new XWalkViewFragment();
 

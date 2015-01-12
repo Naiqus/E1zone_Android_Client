@@ -1,8 +1,11 @@
 package com.naiqus.e1zone;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +40,17 @@ public class XWalkViewFragment extends Fragment {
 
         xWalkCookieManager =new XWalkCookieManager();
         xWalkCookieManager.setAcceptCookie(true);
+
         //load extra from intent and set cookie to xwalkview
         xWalkCookieManager.removeAllCookie();
         String[] cookieArray = getActivity().getIntent().getStringArrayExtra("cookieArray");
         for (String aCookieArray : cookieArray)
             xWalkCookieManager.setCookie(getString(R.string.host_url), aCookieArray);
         //start
+
+        SharedPreferences mPreference = getActivity().getSharedPreferences("preference",Context.MODE_PRIVATE);
+
+        Log.v("from_xview",Boolean.toString(mPreference.getBoolean("logged_in",false)));
         mXWalkView.load(mUrl,null);
         return v;
     }
