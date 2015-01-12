@@ -1,43 +1,48 @@
 package com.naiqus.e1zone;
 
-import android.os.AsyncTask;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-
-import com.wareninja.opensource.discourse.DiscourseApiClient;
-import com.wareninja.opensource.discourse.utils.ResponseModel;
 
 import org.xwalk.core.XWalkPreferences;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+    private XWalkViewFragment mxWalkViewFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         XWalkPreferences.setValue(XWalkPreferences.ANIMATABLE_XWALK_VIEW, true);
         setContentView(R.layout.activity_main);
-        XWalkViewFragment mxWalkViewFragment = new XWalkViewFragment();
+        PreferenceManager.setDefaultValues(this,R.xml.preference,false); //reade preference first
+        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+
+        mxWalkViewFragment = new XWalkViewFragment();
 
         //set up drawer
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
+        NavigationDrawerFragment mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-
-
-
+        //Start the Fragments
         if (savedInstanceState == null){
-            getFragmentManager().beginTransaction()
-                    .add(R.id.main_container, mxWalkViewFragment)
-                    .commit();
+
+//            if(!sharedPreferences.getBoolean("LOGGED_IN",false)){ //if user is not logged in. show login welcome screen
+//            //Todo ...
+//                Intent loginIntent = new Intent(this,LoginActivity.class);
+//                startActivity(loginIntent);
+
+//            }else{
+                getFragmentManager().beginTransaction()
+                        .add(R.id.main_container, mxWalkViewFragment)
+                        .commit();
+                mxWalkViewFragment.setUrl(getString(R.string.host_url));
+//            }
             //set URL to the Fragment
-            mxWalkViewFragment.setUrl(getString(R.string.host_url));
         }
 
     }
