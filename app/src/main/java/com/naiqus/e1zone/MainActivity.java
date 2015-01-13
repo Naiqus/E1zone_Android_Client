@@ -28,18 +28,11 @@ public class MainActivity extends ActionBarActivity {
         //Start the Fragments
         if (savedInstanceState == null){
 
-//            if(!sharedPreferences.getBoolean("LOGGED_IN",false)){ //if user is not logged in. show login welcome screen
-//            //Todo ...
-//                Intent loginIntent = new Intent(this,LoginActivity.class);
-//                startActivity(loginIntent);
-
-//            }else{
                 getFragmentManager().beginTransaction()
                         .add(R.id.main_container, mxWalkViewFragment)
                         .commit();
                 mxWalkViewFragment.setUrl(getString(R.string.host_url));
-//            }
-            //set URL to the Fragment
+
         }
 
     }

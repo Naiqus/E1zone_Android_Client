@@ -24,25 +24,6 @@ public class WelcomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_welcome, container, false);
 
-//        Button mLoginBtn = (Button) v.findViewById(R.id.welcome_login_btn);
-//        Button mRegisterBtn = (Button) v.findViewById(R.id.welcome_register_btn);
-//        // Inflate the layout for this fragment
-//        mLoginBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.v("welcomeF","clicked");
-//                getFragmentManager().beginTransaction()
-//                        .replace(R.id.welcome_placeholder,new LoginFragment())
-//                        .commit();
-//            }
-//        });
-//
-//        mLoginBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
         return v;
     }
 

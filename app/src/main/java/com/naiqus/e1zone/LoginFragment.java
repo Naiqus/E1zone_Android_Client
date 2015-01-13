@@ -4,10 +4,12 @@ package com.naiqus.e1zone;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -65,6 +67,11 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
         // Required empty public constructor
     }
 
+    public void LoginUser(String username,String password){
+        mEmailView.append(username);
+        mPasswordView.append(password);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,7 +94,14 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
                 return false;
             }
         });
-
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("preference",Context.MODE_PRIVATE);//if there is pass and username in preference
+        mEmailView.append(sharedPreferences.getString("user_name",""));
+        mPasswordView.append(sharedPreferences.getString("password", ""));
+        //remove them
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        SharedPreferences mPreference = getActivity().getSharedPreferences("preference",Context.MODE_PRIVATE);
+        Log.v("from_xview",Boolean.toString(mPreference.getBoolean("logged_in",false)));
+        editor.remove("user_name").remove("password");
         Button mEmailSignInButton = (Button) v.findViewById(R.id.login_btn);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,7 +299,6 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
                     getString(R.string.api_key),
                     getString(R.string.api_user)
             );
-//            showProgress(true);
 
             ResponseModel responseModel;
 
@@ -296,18 +309,12 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
             responseModel = mDiscourseClient.loginUser(param); //send login request
             Log.v("DisourseAPI", responseModel.toString());
             mCookieStore = mDiscourseClient.getCookieStore();       //get cookies
-//            Map<String,String> parameters = new HashMap<String, String>();
-//            parameters.put("name", test_username);
-//            parameters.put("email", test_username+"@dummy.com");
-//            parameters.put("username", test_username);
-//            parameters.put("password", test_username+"_pwd");
-//            responseModel = mDiscourseClient.createUser(parameters);
             try {
                 JSONObject mResponse = new JSONObject(responseModel.data.toString());
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("preference",Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 if (mResponse.has("error")){ //signed in failed
-                    mLoginError = mResponse.getString("error").toString();
+                    mLoginError = mResponse.getString("error");
                     editor.putBoolean("logged_in",false);
                     return false;
 
@@ -363,12 +370,16 @@ public class LoginFragment extends Fragment  implements LoaderManager.LoaderCall
                 showProgress(false);
             }else{          //signed in failed
                 showProgress(false);
-                mPasswordView.setError(mLoginError);
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(mLoginError)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                            }
+                        })
+                        .show();
                 mPasswordView.requestFocus();
             }
-
-
         }
-
     }
 }

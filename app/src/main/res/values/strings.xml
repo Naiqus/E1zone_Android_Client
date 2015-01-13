@@ -11,8 +11,8 @@
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="host_url">http://www.e1zone.de</string>
-    <string name="api_user">naiqus</string>
-    <string name="api_key">972f732c3152ab0af0f9eea6bad731e3872f98984fae2f1d738349157d1ba20f</string>
+    <string name="api_user">e1zone</string>
+    <string name="api_key">31643ffeb9c813c388898516bdfef0d5d1ebe9d098151109214aba5a4340e638</string>
     <!--<string name="host_url">http://www.html-kit.com/tools/cookietester/</string>-->
 
 

@@ -2,16 +2,25 @@
     <string name="title_activity_login">东一区</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_username">Username/Email</string>
-    <string name="prompt_password">Password</string>
+    <string name="login_username">Username/Email</string>
+    <string name="login_password">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_register">Create a new account</string>
     <string name="action_register_short">Register</string>
     <string name="action_sign_in_short">Sign in</string>
 
+    <string name="register_name">Full Name (optional)</string>
+    <string name="register_username">Username</string>
+    <string name="register_password">Enter password</string>
+    <string name="register_password_confirm">Enter password again</string>
+    <string name="register_email">Your email</string>
+    <string name="register_welcome">Your account is created,welcome! </string>
+
+
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_username">This username is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
+    <string name="error_password_confirm">The password is not the same with the last one!</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 </resources>

@@ -1,6 +1,9 @@
 package com.naiqus.e1zone;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,20 +23,34 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        WelcomeFragment mWelcomeFragment = new WelcomeFragment();
-
-        if (savedInstanceState == null){
-            getFragmentManager().beginTransaction()
-                    .add(R.id.welcome_placeholder,mWelcomeFragment)
-                    .commit();
+        //check if already logged in
+        SharedPreferences sharedPreferences = getSharedPreferences("preference", Context.MODE_PRIVATE);
+        if (sharedPreferences.getBoolean("logged_in",false)){
+            //yes start main activity
+            Log.v("loginActivity_Logged_in",Boolean.toString(sharedPreferences.getBoolean("logged_in",false)));
+            Intent mainActivityIntent = new Intent(this,MainActivity.class);
+            startActivity(mainActivityIntent);
+        }else{
+            //not yet. start welcome screen
+            setContentView(R.layout.activity_login);
+            WelcomeFragment mWelcomeFragment = new WelcomeFragment();
+            if (savedInstanceState == null){
+                getFragmentManager().beginTransaction()
+                        .add(R.id.welcome_placeholder,mWelcomeFragment)
+                        .commit();
+            }
         }
     }
 
     public void WelcomeLoginBtn(View v){
-        Log.v("welcomeF", "clicked");
         getFragmentManager().beginTransaction()
                 .replace(R.id.welcome_placeholder,new LoginFragment())
+                .commit();
+    }
+
+    public void WelcomeRegisterBtn(View v){
+        getFragmentManager().beginTransaction()
+                .replace(R.id.welcome_placeholder,new RegisterFragment())
                 .commit();
     }
 
